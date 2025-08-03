@@ -1,0 +1,25 @@
+Final time is 1. 
+Tolerance is 1.00e-12. 
+Epsilon is 1.00e+00. 
+Mesh 1, num_time_steps=4, Avg_iter=2 with Avg_relax=1.70e+01, Avg_Newt=1.250000e+00, Avg_residue=4.15e-02
+Mesh 1. MAXL2error=1.37e-01, L1W11error:3.02e-01, L2H1error:4.44e-01 
+Mesh 2, num_time_steps=8, Avg_iter=2 with Avg_relax=1.70e+01, Avg_Newt=1.250000e+00, Avg_residue=2.22e-03
+Mesh 2. MAXL2error=8.18e-02, L1W11error:1.31e-01, L2H1error:1.53e-01 
+Mesh 3, num_time_steps=16, Avg_iter=2 with Avg_relax=1.70e+01, Avg_Newt=1.437500e+00, Avg_residue=2.36e-04
+Mesh 3. MAXL2error=4.66e-02, L1W11error:7.40e-02, L2H1error:8.68e-02 
+
+Elapsed time is 4.1186seconds
+MaxL2 error and convergence rate:
+	1.37e-01
+	8.18e-02 	 7.48e-01
+	4.66e-02 	 8.09e-01
+
+L1W11 error and convergence rate:
+	3.02e-01
+	1.31e-01 	 1.21e+00
+	7.40e-02 	 8.18e-01
+
+L2H1 error and convergence rate:
+	4.44e-01
+	1.53e-01 	 1.54e+00
+	8.68e-02 	 8.17e-01
