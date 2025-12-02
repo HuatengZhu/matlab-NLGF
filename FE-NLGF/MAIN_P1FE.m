@@ -13,7 +13,7 @@ tol=1e-12;
 epsilon = 1;% minimal surface flow
 
 %% The meshes are available at https://github.com/jdroniou/HHO-Lapl-OM
-meshes={'mesh1_1.mat';'mesh1_2.mat';'mesh1_3.mat'};%'mesh1_4.mat';'mesh1_5.mat';'mesh1_6.mat'};
+meshes={'mesh1_1.mat';'mesh1_2.mat';'mesh1_3.mat';'mesh1_4.mat';'mesh1_5.mat';'mesh1_6.mat'};
 nbmeshes=size(meshes,1);
 
 %% Initiations
@@ -37,7 +37,9 @@ ave_newton = zeros(nbmeshes, 1);
 fid = fopen('results.txt','w');
 
 %% Test case number
-ucase = 1;
+% 1 => cos(t)*(cos(pi*x).*cos(pi*y))
+% 2 => cos(t)* abs(x).^3 .* (1-x).^2 .* abs(y).^3 .* (1-y).^2
+ucase = 2;
 
 % Min relax
 relaxmin = 1e-5;
@@ -47,7 +49,7 @@ forkprint(fid,str);
 str = sprintf('Tolerance is %4.2e. \n',tol);
 forkprint(fid,str);
 str = sprintf('Epsilon is %4.2e. \n', epsilon);
-forkprint(fid,str);
+
 
 %% Loop over each mesh in the sequence
 for imesh=1:nbmeshes
@@ -61,6 +63,9 @@ for imesh=1:nbmeshes
     cg=gravity_centers(ncell, cell_v, vertex, area);
     h(imesh)=max(abs(diam));
 
+    epsilon = h(imesh); 
+    str = sprintf('Epsilon is %4.2e. \n', epsilon);
+    forkprint(fid,str);
     %% Time steps
     Ndt(imesh) = ceil(T/h(imesh)); %k = O(h)
     % Ndt(imesh) = ceil(T/h(imesh)^2); %k = O(h^2)
@@ -95,8 +100,8 @@ for imesh=1:nbmeshes
     for idt = 1 : Ndt(imesh)
         b = assemble_source(cell_v, ncell, nvert, area, cg, idt * dt, epsilon, ucase);
 
-        [U, num_updates, iter, res] = compute_staionary_system(cell_v, ncell, nvert, vertex, dt, epsilon, itermax, tol, relaxmin, num_updates, M, b, U_pre);
-       
+        [U, num_updates, iter, res] = compute_staionary_system(cell_v, ncell, nvert, vertex, dt, epsilon, itermax, tol, relaxmin, num_updates, M, b, U_pre, area);
+
         %% Newton data
         ave_newton(imesh) = ave_newton(imesh) + iter;
         ITER = ITER + iter;
@@ -109,7 +114,7 @@ for imesh=1:nbmeshes
         str = sprintf('Solution computed, iter=%d, res=%4.2e \n', iter, res);
         % forkprint(fid,str);
 
-         U_pre = U;
+        U_pre = U;
         %% Create files for visualising the approximate and exact solution
         % if imesh == nbmeshes
         % write_solution_vtk(X,strcat('VTKout/p1_c_diffusion_solution',num2str(idt)),ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex); % Print the scheme solution at current time in Paraview
@@ -217,7 +222,7 @@ y0 = 6e-3;     % starting y (closer to bottom)
 % Triangle vertices (flipped horizontally)
 x1 = x0 * r;         % move right (flipped direction)
 y1 = y0;
-x2 = x0 * r;         
+x2 = x0 * r;
 y2 = y0 * r;         % move up to keep slope 1
 % Draw the triangle
 plot([x0, x1], [y0, y1], 'k', 'LineWidth', 1,'HandleVisibility','off');         % horizontal
@@ -225,10 +230,10 @@ plot([x1, x2], [y1, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         
 plot([x0, x2], [y0, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         % diagonal (hypotenuse)
 %Label horizontal edge with "1"
 text(sqrt(x0 * x1), y0 * 0.8, '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'center');
+    'FontSize', 10, 'HorizontalAlignment', 'center');
 % Label vertical edge with "1"
 text(x1 * 1.1, sqrt(y1 * y2), '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
+    'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
 
 title('Errors in $L^{\infty}L^2$ norm on the functions','Interpreter','latex')
 xlabel('$h$','Interpreter','latex')
@@ -246,10 +251,10 @@ plot([x1, x2], [y1, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         
 plot([x0, x2], [y0, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         % diagonal (hypotenuse)
 %Label horizontal edge with "1"
 text(sqrt(x0 * x1), y0 * 0.8, '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'center');
+    'FontSize', 10, 'HorizontalAlignment', 'center');
 % Label vertical edge with "1"
 text(x1 * 1.1, sqrt(y1 * y2), '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
+    'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
 
 title('Errors in $L^1L^{1}$ norm on the gradients','Interpreter','latex')
 xlabel('$h$','Interpreter','latex')
@@ -267,10 +272,10 @@ plot([x1, x2], [y1, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         
 plot([x0, x2], [y0, y2], 'k', 'LineWidth', 1,'HandleVisibility','off');         % diagonal (hypotenuse)
 %Label horizontal edge with "1"
 text(sqrt(x0 * x1), y0 * 0.8, '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'center');
+    'FontSize', 10, 'HorizontalAlignment', 'center');
 % Label vertical edge with "1"
 text(x1 * 1.1, sqrt(y1 * y2), '1', ...
-     'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
+    'FontSize', 10, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
 
 title('Errors in $L^2L^{2}$ norm on the gradients','Interpreter','latex')
 xlabel('$h$','Interpreter','latex')

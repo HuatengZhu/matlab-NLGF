@@ -1,4 +1,4 @@
-function [U, num_updates, iter, res] = compute_staionary_system(cell_v, ncell, nvert, vertex, dt, epsilon, itermax, tol, relaxmin, num_updates, M, b, U_pre);
+function [U, num_updates, iter, res] = compute_staionary_system(cell_v, ncell, nvert, vertex, dt, epsilon, itermax, tol, relaxmin, num_updates, M, b, U_pre, area);
 
 rhs = M * U_pre + dt * b;
 iter = 0;
@@ -9,7 +9,7 @@ X_pre = U_pre; %test_cases(idt*dt,vertex, ucase)'; % initial guess of the soluti
 relax = 0.1;
 res_pre = 1.;
 while ( iter < itermax && res > tol && relax > relaxmin )
-    [J, F] = assemble_jacobian_system(cell_v,ncell,nvert,vertex, X_pre, epsilon);
+    [J, F] = assemble_jacobian_system(cell_v,ncell,nvert,vertex, X_pre, area, epsilon);
    
     Aglob = M + dt .* J;
     RHS = rhs - ( M + dt .* F)* X_pre ;

@@ -10,10 +10,12 @@ itermax=1000;
 tol=1e-12;
 
 %% Epsilon
-epsilon = 1;% minimal surface flow
+% minimal surface flow when epsilon = 1.
+epsilon = 1;
 
 %% The meshes are available at https://github.com/jdroniou/HHO-Lapl-OM
-meshes={'mesh1_1.mat';'mesh1_2.mat';'mesh1_3.mat'};%'mesh1_4.mat';'mesh1_5.mat';'mesh1_6.mat'};
+meshes={'mesh1_1.mat';'mesh1_2.mat';'mesh1_3.mat';'mesh1_4.mat';'mesh1_5.mat';'mesh1_6.mat'};
+% meshes={'mesh1_3.mat';'mesh1_4.mat';'mesh1_5.mat';'mesh1_6.mat'};
 nbmeshes=size(meshes,1);
 
 %% Initiations
@@ -37,7 +39,9 @@ ave_newton = zeros(nbmeshes, 1);
 fid = fopen('results.txt','w');
 
 %% Test case number
-ucase = 1;
+% 1 => cos(t)*(cos(pi*x).*cos(pi*y))
+% 2 => cos(t)* abs(x).^3 .* (1-x).^2 .* abs(y).^3 .* (1-y).^2
+ucase =1;
 
 % Min relax
 relaxmin = 1e-5;
@@ -63,6 +67,11 @@ for imesh=1:nbmeshes
     h(imesh)=max(abs(diam)); %mesh size
     mpe=midpoints_edges(ncell,nedge,cell_e,cell_v,vertex); %midpoint of all edges
 
+    % epsilon = sqrt(h(imesh));
+    % epsilon = h(imesh);
+    % str = sprintf('Epsilon is %4.2e. \n', epsilon);
+    % forkprint(fid,str);
+
     %% Time steps
     Ndt(imesh) = ceil(T/h(imesh)); %k = O(h)
     % Ndt(imesh) = ceil(T/h(imesh)^2); %k = O(h^2)
@@ -70,16 +79,16 @@ for imesh=1:nbmeshes
     ave_newton(imesh) = 0;
 
     %% Initial condition
-    U_pre = test_cases(0,mpe, ucase)';
+    U_pre = test_cases(0, mpe, ucase)';
 
     %% Assemble mass matrices
     M = assemble_mass_system(area, ncell, cell_e, nedge);
 
     % Print the scheme solution and exact solution at initial condition to view in Paraview
-    if imesh == nbmeshes
-    write_solution_vtk_ncP1(U_pre, strcat('VTKout/ncp1_solution0'), ncell, nedge, nvert, cell_v, cell_n, cell_e, vertex);
-    write_solution_vtk_ncP1(U_pre, strcat('VTKout/exact_solution0'), ncell, nedge, nvert, cell_v, cell_n, cell_e, vertex);
-    end
+    % if imesh == nbmeshes
+    % write_solution_vtk_ncP1(U_pre, strcat('VTKout/ncp1_solution0'), ncell, nedge, nvert, cell_v, cell_n, cell_e, vertex);
+    % write_solution_vtk_ncP1(U_pre, strcat('VTKout/exact_solution0'), ncell, nedge, nvert, cell_v, cell_n, cell_e, vertex);
+    % end
 
     %% Error norms initiation
     L2error = zeros(Ndt(imesh), 1);
@@ -113,11 +122,11 @@ for imesh=1:nbmeshes
 
          U_pre = U;
         % Create files for visualising the approximate and exact solution
-        if imesh == nbmeshes
-        write_solution_vtk_ncP1(U,strcat('VTKout/ncp1_solution',num2str(idt)),ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex); % Print the scheme solution at current time in Paraview
-        write_solution_vtk_ncP1(test_cases(idt*dt, mpe, ucase)',strcat('VTKout/exact_solution',num2str(idt)),ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex); % Print the exact solution at current time in Paraview
-        write_solution_vtk_ncP1(zeros(size(U)),'VTKout/grid',ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex);
-        end
+        % if imesh == nbmeshes
+        % write_solution_vtk_ncP1(U,strcat('VTKout/ncp1_solution',num2str(idt)),ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex); % Print the scheme solution at current time in Paraview
+        % write_solution_vtk_ncP1(test_cases(idt*dt, mpe, ucase)',strcat('VTKout/exact_solution',num2str(idt)),ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex); % Print the exact solution at current time in Paraview
+        % write_solution_vtk_ncP1(zeros(size(U)),'VTKout/grid',ncell,nedge,nvert,cell_v,cell_n,cell_e,vertex);
+        % end
     end
 
     ITER=ceil(ITER/Ndt(imesh));
