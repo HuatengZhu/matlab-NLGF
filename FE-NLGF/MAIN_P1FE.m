@@ -63,9 +63,9 @@ for imesh=1:nbmeshes
     cg=gravity_centers(ncell, cell_v, vertex, area);
     h(imesh)=max(abs(diam));
 
-    epsilon = h(imesh); 
-    str = sprintf('Epsilon is %4.2e. \n', epsilon);
-    forkprint(fid,str);
+    % epsilon = h(imesh); 
+    % str = sprintf('Epsilon is %4.2e. \n', epsilon);
+    % forkprint(fid,str);
     %% Time steps
     Ndt(imesh) = ceil(T/h(imesh)); %k = O(h)
     % Ndt(imesh) = ceil(T/h(imesh)^2); %k = O(h^2)
